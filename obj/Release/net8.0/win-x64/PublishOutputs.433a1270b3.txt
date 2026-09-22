@@ -1,0 +1,2 @@
+C:\Users\pv52wcl\Desktop\Code_Quest\bin\Release\net8.0\win-x64\publish\CodeQuest.pdb
+C:\Users\pv52wcl\Desktop\Code_Quest\bin\Release\net8.0\win-x64\publish\CodeQuest.exe
