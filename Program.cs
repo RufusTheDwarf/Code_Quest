@@ -46,10 +46,10 @@ class Program
         List<Enemy> enemies = new List<Enemy>
         {
             new Enemy { Name = "Bug", Emoji = "🐛", MaxHp = enemyHp, Hp = enemyHp },
-            new Enemy { Name = "Malware", Emoji = "🤖", MaxHp = enemyHp, Hp = enemyHp },
-            new Enemy { Name = "Hacker", Emoji = "👾", MaxHp = enemyHp, Hp = enemyHp },
-            new Enemy { Name = "Segmentation Fault", Emoji = "💀", MaxHp = enemyHp, Hp = enemyHp },
-            new Enemy { Name = "Final Boss : The Compiler", Emoji = "🐉", MaxHp = enemyHp + 2, Hp = enemyHp + 2 },
+            new Enemy { Name = "Malware", Emoji = "🦠", MaxHp = enemyHp, Hp = enemyHp },
+            new Enemy { Name = "Hacker", Emoji = "💻", MaxHp = enemyHp, Hp = enemyHp },
+            new Enemy { Name = "Segmentation Fault", Emoji = "💥", MaxHp = enemyHp, Hp = enemyHp },
+            new Enemy { Name = "Final Boss : The Compiler", Emoji = "👾", MaxHp = enemyHp + 2, Hp = enemyHp + 2 },
         };
 
         foreach (var enemy in enemies)
@@ -66,9 +66,9 @@ class Program
                     Shuffle(bank);
                     qIndex = 0;
                 }
-                Question q = bank[qIndex++];
 
-                bool correct = AskQuestion(q);
+                Question q = bank[qIndex++];
+                var (correct, correctAnswerText) = AskQuestion(q);
 
                 if (correct)
                 {
@@ -79,7 +79,7 @@ class Program
                     Console.ResetColor();
                     Console.WriteLine(q.Explanation);
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"\n⚔️  {enemy.Name} perd 1 PV !");
+                    Console.WriteLine($"\n⚔️ {enemy.Name} perd 1 PV !");
                     Console.ResetColor();
                 }
                 else
@@ -90,8 +90,8 @@ class Program
                     Console.WriteLine("\n❌ Mauvaise réponse !\n");
                     Console.ResetColor();
                     Console.WriteLine("La bonne réponse était :");
-                    Console.WriteLine($"{q.CorrectIndex + 1}. {q.Answers[q.CorrectIndex]}");
-                    Console.WriteLine($"\n💥 {enemy.Name} contre-attaque !");
+                    Console.WriteLine(correctAnswerText);
+                    Console.WriteLine($"\n {enemy.Name} contre-attaque !");
                     Console.WriteLine("Vous perdez 1 PV.");
                 }
 
@@ -106,7 +106,7 @@ class Program
                 {
                     xp += 20;
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"\n🎉 {enemy.Name} VAINCU !");
+                    Console.WriteLine($"\n {enemy.Name} VAINCU !");
                     Console.WriteLine("+20 XP");
                     Console.ResetColor();
 
@@ -145,8 +145,8 @@ class Program
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("========================================");
-        Console.WriteLine("          ⚔️  CODE QUEST  ⚔️");
-        Console.WriteLine("       LE RPG QUIZ INFORMATIQUE");
+        Console.WriteLine(" ⚔️ CODE QUEST ⚔️");
+        Console.WriteLine(" LE RPG QUIZ INFORMATIQUE");
         Console.WriteLine("========================================");
         Console.ResetColor();
         Console.WriteLine("\nBienvenue dans Code Quest !\n");
@@ -164,8 +164,10 @@ class Program
             Console.WriteLine("3. Difficile");
             Console.Write("\nVotre choix : ");
             string input = Console.ReadLine();
+
             if (input == "1" || input == "2" || input == "3")
                 return int.Parse(input);
+
             Console.WriteLine("\nChoix invalide.\n");
         }
     }
@@ -174,7 +176,7 @@ class Program
     {
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine("----------------------------------------");
-        Console.WriteLine($"   Un ennemi apparaît : {enemy.Emoji} {enemy.Name}");
+        Console.WriteLine($" Un ennemi apparaît : {enemy.Emoji} {enemy.Name}");
         Console.WriteLine("----------------------------------------");
         Console.ResetColor();
         Thread.Sleep(500);
@@ -182,17 +184,25 @@ class Program
 
     static void PrintStatus(int playerHp, int playerMaxHp, int level, Enemy enemy)
     {
-        Console.WriteLine($"Niveau {level}   PV : {playerHp}/{playerMaxHp}   |   {enemy.Emoji} {enemy.Name} PV : {Math.Max(enemy.Hp, 0)}/{enemy.MaxHp}\n");
+        Console.WriteLine($"Niveau {level} PV : {playerHp}/{playerMaxHp} | {enemy.Emoji} {enemy.Name} PV : {Math.Max(enemy.Hp, 0)}/{enemy.MaxHp}\n");
     }
 
-    static bool AskQuestion(Question q)
+    static (bool correct, string correctAnswerText) AskQuestion(Question q)
     {
+        // Copier et mélanger les réponses
+        string[] shuffledAnswers = (string[])q.Answers.Clone();
+        ShuffleArray(shuffledAnswers);
+
+        // Trouver le nouvel index de la bonne réponse
+        int newCorrectIndex = Array.IndexOf(shuffledAnswers, q.Answers[q.CorrectIndex]);
+
         Console.WriteLine("----------------------------------------");
-        Console.WriteLine("              💻 QUESTION");
+        Console.WriteLine(" QUESTION");
         Console.WriteLine("----------------------------------------\n");
         Console.WriteLine(q.Text + "\n");
-        for (int i = 0; i < q.Answers.Length; i++)
-            Console.WriteLine($"{i + 1}. {q.Answers[i]}");
+
+        for (int i = 0; i < shuffledAnswers.Length; i++)
+            Console.WriteLine($"{i + 1}. {shuffledAnswers[i]}");
 
         int choice = -1;
         while (choice < 1 || choice > 4)
@@ -204,7 +214,10 @@ class Program
                 Console.WriteLine("Entrez un nombre entre 1 et 4.");
         }
 
-        return choice - 1 == q.CorrectIndex;
+        bool isCorrect = (choice - 1 == newCorrectIndex);
+        string correctAnswerText = $"{newCorrectIndex + 1}. {shuffledAnswers[newCorrectIndex]}";
+
+        return (isCorrect, correctAnswerText);
     }
 
     static void ShowVictory(int level, int correct, int wrong)
@@ -212,10 +225,9 @@ class Program
         Console.Clear();
         int total = correct + wrong;
         int score = total == 0 ? 0 : (int)Math.Round(100.0 * correct / total);
-
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("========================================");
-        Console.WriteLine("             🏆 VICTOIRE !");
+        Console.WriteLine(" VICTOIRE !");
         Console.WriteLine("========================================");
         Console.ResetColor();
         Console.WriteLine("\nVous avez vaincu le Boss !\n");
@@ -224,7 +236,7 @@ class Program
         Console.WriteLine($"Mauvaises réponses : {wrong}");
         Console.WriteLine($"\nScore : {score}%\n");
         Console.WriteLine("========================================");
-        Console.WriteLine("       MERCI D'AVOIR JOUÉ !");
+        Console.WriteLine(" MERCI D'AVOIR JOUÉ !");
         Console.WriteLine("========================================\n");
 
         if (score < 50)
@@ -240,10 +252,9 @@ class Program
         Console.Clear();
         int total = correct + wrong;
         int score = total == 0 ? 0 : (int)Math.Round(100.0 * correct / total);
-
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("========================================");
-        Console.WriteLine("             💀 GAME OVER");
+        Console.WriteLine(" GAME OVER");
         Console.WriteLine("========================================");
         Console.ResetColor();
         Console.WriteLine("\nVous avez été vaincu...\n");
@@ -252,7 +263,7 @@ class Program
         Console.WriteLine($"Mauvaises réponses : {wrong}");
         Console.WriteLine($"\nScore : {score}%\n");
         Console.WriteLine("========================================");
-        Console.WriteLine("       MERCI D'AVOIR JOUÉ !");
+        Console.WriteLine(" MERCI D'AVOIR JOUÉ !");
         Console.WriteLine("========================================");
     }
 
@@ -264,6 +275,17 @@ class Program
             n--;
             int k = rng.Next(n + 1);
             (list[k], list[n]) = (list[n], list[k]);
+        }
+    }
+
+    static void ShuffleArray<T>(T[] array)
+    {
+        int n = array.Length;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            (array[k], array[n]) = (array[n], array[k]);
         }
     }
 
@@ -325,7 +347,7 @@ class Program
             new Question { Difficulty=3, Text="Qu'est-ce qu'une API REST ?", Answers=new[]{"Un protocole de chiffrement","Une architecture pour échanger des données via HTTP","Un système d'exploitation","Un langage de programmation"}, CorrectIndex=1, Explanation="REST est un style d'architecture pour des API web basées sur HTTP." },
             new Question { Difficulty=3, Text="Que permet la commande 'git merge' ?", Answers=new[]{"Supprimer une branche","Fusionner deux branches","Créer un nouveau dépôt","Compresser un fichier"}, CorrectIndex=1, Explanation="git merge fusionne l'historique de deux branches." },
             new Question { Difficulty=3, Text="Sous Linux, que fait la commande 'chmod' ?", Answers=new[]{"Change le nom d'un fichier","Modifie les permissions d'un fichier","Compresse un fichier","Affiche le contenu d'un fichier"}, CorrectIndex=1, Explanation="chmod modifie les droits d'accès (lecture/écriture/exécution) d'un fichier." },
-            new Question { Difficulty=3, Text="Qu'est-ce que la virtualisation ?", Answers=new[]{"Exécuter plusieurs systèmes sur un même matériel physique","Un type de virus","Un protocole réseau","Une technique de chiffrement"}, CorrectIndex=0, Explanation="La virtualisation permet de faire tourner plusieurs OS sur une même machine physique." },
+            new Question { Difficulty=3, Text="Qu'est-ce que la virtualisation ?", Answers=new[]{"Exécuter plusieurs systèmes sur un même matériel physique","Un type de virus","Un protocole réseau","Une technique de chiffrement"}, CorrectIndex=0, Explanation="La virtualisation permet de faire tourner plusieurs OS sur une même machine." },
         };
     }
 }
