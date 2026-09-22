@@ -23,14 +23,27 @@ class Enemy
 class Program
 {
     static Random rng = new Random();
+    const int BarWidth = 30;
 
     static void Main()
     {
-        try { Console.OutputEncoding = System.Text.Encoding.UTF8; } catch { }
+        try
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.CursorVisible = false;
+        }
+        catch { }
+
+        try
+        {
+            if (Console.WindowWidth < 100) Console.WindowWidth = 100;
+            if (Console.WindowHeight < 30) Console.WindowHeight = 30;
+        }
+        catch { }
 
         ShowIntro();
         int difficulty = ChooseDifficulty();
-        int enemyHp = difficulty == 1 ? 3 : difficulty == 2 ? 4 : 5;
+        int enemyHpBase = difficulty == 1 ? 3 : difficulty == 2 ? 4 : 5;
 
         List<Question> bank = BuildQuestionBank().Where(q => q.Difficulty <= difficulty).ToList();
         Shuffle(bank);
@@ -45,22 +58,19 @@ class Program
 
         List<Enemy> enemies = new List<Enemy>
         {
-            new Enemy { Name = "Bug", Emoji = "🐛", MaxHp = enemyHp, Hp = enemyHp },
-            new Enemy { Name = "Malware", Emoji = "🦠", MaxHp = enemyHp, Hp = enemyHp },
-            new Enemy { Name = "Hacker", Emoji = "💻", MaxHp = enemyHp, Hp = enemyHp },
-            new Enemy { Name = "Segmentation Fault", Emoji = "💥", MaxHp = enemyHp, Hp = enemyHp },
-            new Enemy { Name = "Final Boss : The Compiler", Emoji = "👾", MaxHp = enemyHp + 2, Hp = enemyHp + 2 },
+            new Enemy { Name = "Bug", Emoji = "🐛", MaxHp = enemyHpBase, Hp = enemyHpBase },
+            new Enemy { Name = "Malware", Emoji = "🦠", MaxHp = enemyHpBase, Hp = enemyHpBase },
+            new Enemy { Name = "Hacker", Emoji = "💻", MaxHp = enemyHpBase, Hp = enemyHpBase },
+            new Enemy { Name = "Segmentation Fault", Emoji = "💥", MaxHp = enemyHpBase, Hp = enemyHpBase },
+            new Enemy { Name = "The Compiler", Emoji = "👾", MaxHp = enemyHpBase + 2, Hp = enemyHpBase + 2 },
         };
 
         foreach (var enemy in enemies)
         {
-            Console.Clear();
-            PrintEnemyIntro(enemy);
+            ShowEnemyIntro(enemy);
 
             while (enemy.Hp > 0 && playerHp > 0)
             {
-                PrintStatus(playerHp, playerMaxHp, level, enemy);
-
                 if (qIndex >= bank.Count)
                 {
                     Shuffle(bank);
@@ -68,66 +78,82 @@ class Program
                 }
 
                 Question q = bank[qIndex++];
-                var (correct, correctAnswerText) = AskQuestion(q);
+
+                // Mélange aléatoire des réponses
+                string[] shuffledAnswers = (string[])q.Answers.Clone();
+                ShuffleArray(shuffledAnswers);
+                int newCorrectIndex = Array.IndexOf(shuffledAnswers, q.Answers[q.CorrectIndex]);
+
+                // Boucle de sélection avec les flèches
+                int selected = 0;
+                Console.Clear();
+                while (true)
+                {
+                    DrawGameScreen(enemy, q.Text, shuffledAnswers, selected, playerHp, playerMaxHp, level, xp, null, ConsoleColor.White, -1);
+                    var key = Console.ReadKey(true).Key;
+
+                    if (key == ConsoleKey.UpArrow)
+                        selected = (selected - 1 + shuffledAnswers.Length) % shuffledAnswers.Length;
+                    else if (key == ConsoleKey.DownArrow)
+                        selected = (selected + 1) % shuffledAnswers.Length;
+                    else if (key == ConsoleKey.Enter)
+                        break;
+                }
+
+                bool correct = (selected == newCorrectIndex);
+                string correctAnswerText = shuffledAnswers[newCorrectIndex];
+
+                string message;
+                ConsoleColor msgColor;
 
                 if (correct)
                 {
                     correctCount++;
                     enemy.Hp--;
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("\n✅ Bonne réponse !\n");
-                    Console.ResetColor();
-                    Console.WriteLine(q.Explanation);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"\n⚔️ {enemy.Name} perd 1 PV !");
-                    Console.ResetColor();
+                    message = "✅  Bonne réponse !";
+                    msgColor = ConsoleColor.Green;
                 }
                 else
                 {
                     wrongCount++;
                     playerHp--;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n❌ Mauvaise réponse !\n");
-                    Console.ResetColor();
-                    Console.WriteLine("La bonne réponse était :");
-                    Console.WriteLine(correctAnswerText);
-                    Console.WriteLine($"\n {enemy.Name} contre-attaque !");
-                    Console.WriteLine("Vous perdez 1 PV.");
+                    message = $"❌  Mauvaise réponse !  →  {correctAnswerText}";
+                    msgColor = ConsoleColor.Red;
                 }
 
-                Thread.Sleep(700);
-                Console.WriteLine("\nAppuyez sur une touche pour continuer...");
-                Console.ReadKey(true);
+                // Écran de feedback
                 Console.Clear();
+                DrawGameScreen(enemy, q.Text, shuffledAnswers,
+                    correct ? newCorrectIndex : selected,
+                    playerHp, playerMaxHp, level, xp, message, msgColor, newCorrectIndex);
+
+                // Explication en bas
+                CenterWrite(q.Explanation, Console.WindowHeight - 5, ConsoleColor.DarkGray);
+                CenterWrite("Appuyez sur une touche pour continuer...", Console.WindowHeight - 2, ConsoleColor.DarkGray);
+                Console.ReadKey(true);
+
+                // Vider le buffer clavier pour éviter les pressions résiduelles
+                while (Console.KeyAvailable) Console.ReadKey(true);
 
                 if (playerHp <= 0) break;
 
                 if (enemy.Hp <= 0)
                 {
                     xp += 20;
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"\n {enemy.Name} VAINCU !");
-                    Console.WriteLine("+20 XP");
-                    Console.ResetColor();
-
                     int newLevel = 1 + xp / 40;
+
                     if (newLevel > level)
                     {
                         int oldMaxHp = playerMaxHp;
                         level = newLevel;
                         playerMaxHp++;
                         playerHp = Math.Min(playerHp + 1, playerMaxHp);
-                        Console.ForegroundColor = ConsoleColor.Magenta;
-                        Console.WriteLine("\n⭐ LEVEL UP !");
-                        Console.WriteLine($"Vous êtes maintenant niveau {level} !");
-                        Console.WriteLine($"PV maximum : {oldMaxHp} → {playerMaxHp}");
-                        Console.ResetColor();
+                        ShowLevelUp(level, oldMaxHp, playerMaxHp);
                     }
-
-                    Thread.Sleep(900);
-                    Console.WriteLine("\nAppuyez sur une touche pour continuer...");
-                    Console.ReadKey(true);
-                    Console.Clear();
+                    else
+                    {
+                        ShowEnemyDefeated(enemy, 20);
+                    }
                 }
             }
 
@@ -138,134 +164,239 @@ class Program
             ShowGameOver(level, correctCount, wrongCount);
         else
             ShowVictory(level, correctCount, wrongCount);
+
+        try { Console.CursorVisible = true; } catch { }
     }
+
+    // ------------------------------------------------------------------
+    // HELPERS D'AFFICHAGE
+    // ------------------------------------------------------------------
+
+    static void WriteAt(string text, int x, int y, ConsoleColor fg, ConsoleColor? bg = null)
+    {
+        if (y < 0 || y >= Console.WindowHeight) return;
+        if (x < 0) x = 0;
+        try { Console.SetCursorPosition(x, y); } catch { return; }
+        Console.ForegroundColor = fg;
+        if (bg.HasValue) Console.BackgroundColor = bg.Value;
+        Console.Write(text);
+        Console.ResetColor();
+    }
+
+    static void CenterWrite(string text, int y, ConsoleColor fg = ConsoleColor.Gray, ConsoleColor? bg = null)
+    {
+        if (text == null) text = "";
+        int w = Console.WindowWidth;
+        int x = Math.Max(0, (w - text.Length) / 2);
+        WriteAt(text, x, y, fg, bg);
+    }
+
+    static string MakeHpBar(int current, int max, int width)
+    {
+        if (max <= 0) max = 1;
+        if (current < 0) current = 0;
+        if (current > max) current = max;
+        int filled = (int)Math.Round((double)current / max * width);
+        return new string('█', filled) + new string('░', width - filled);
+    }
+
+    // ------------------------------------------------------------------
+    // ÉCRAN DE JEU PRINCIPAL
+    // ------------------------------------------------------------------
+
+    static void DrawGameScreen(Enemy enemy, string questionText, string[] answers,
+        int selected, int playerHp, int playerMaxHp, int level, int xp,
+        string message, ConsoleColor messageColor, int correctAnswerIndex)
+    {
+        int w = Console.WindowWidth;
+        int h = Console.WindowHeight;
+        int sepWidth = Math.Min(w - 10, 70);
+
+        // En-tête : niveau + XP
+        CenterWrite($"⚔   Niveau {level}      XP : {xp}", 1, ConsoleColor.Cyan);
+
+        // Ennemi au milieu-haut
+        CenterWrite($"{enemy.Emoji}   {enemy.Name}   {enemy.Emoji}", 3, ConsoleColor.DarkYellow);
+        string eBar = MakeHpBar(Math.Max(enemy.Hp, 0), enemy.MaxHp, BarWidth);
+        CenterWrite($"[{eBar}]   {Math.Max(enemy.Hp, 0)}/{enemy.MaxHp}", 4, ConsoleColor.Red);
+
+        // Séparateur
+        CenterWrite(new string('─', sepWidth), 6, ConsoleColor.DarkGray);
+
+        // Question
+        CenterWrite(questionText, 8, ConsoleColor.White);
+
+        // Réponses
+        int answersY = 10;
+        for (int i = 0; i < answers.Length; i++)
+        {
+            string line = $"  {i + 1}. {answers[i]}  ";
+            string fullLine = "▶ " + line;
+
+            if (i == correctAnswerIndex)
+                CenterWrite(fullLine, answersY + i, ConsoleColor.Black, ConsoleColor.Green);
+            else if (i == selected)
+                CenterWrite(fullLine, answersY + i, ConsoleColor.Black, ConsoleColor.Cyan);
+            else
+                CenterWrite("  " + line, answersY + i, ConsoleColor.Gray);
+        }
+
+        // Séparateur bas
+        int sep2Y = answersY + answers.Length + 1;
+        CenterWrite(new string('─', sepWidth), sep2Y, ConsoleColor.DarkGray);
+
+        // Joueur : barre de vie en bas au centre
+        CenterWrite("VOUS", sep2Y + 2, ConsoleColor.Green);
+        string pBar = MakeHpBar(playerHp, playerMaxHp, BarWidth);
+        CenterWrite($"[{pBar}]   {playerHp}/{playerMaxHp}", sep2Y + 3, ConsoleColor.Green);
+
+        // Message / aide en bas
+        if (!string.IsNullOrEmpty(message))
+        {
+            // Effacer la ligne puis afficher le message
+            try { Console.SetCursorPosition(0, h - 3); Console.Write(new string(' ', w)); } catch { }
+            CenterWrite(message, h - 3, messageColor);
+        }
+        else
+        {
+            try { Console.SetCursorPosition(0, h - 3); Console.Write(new string(' ', w)); } catch { }
+            CenterWrite("↑ ↓ pour choisir   •   Entrée pour valider", h - 3, ConsoleColor.DarkGray);
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // ÉCRANS DIVERS
+    // ------------------------------------------------------------------
 
     static void ShowIntro()
     {
         Console.Clear();
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("========================================");
-        Console.WriteLine(" ⚔️ CODE QUEST ⚔️");
-        Console.WriteLine(" LE RPG QUIZ INFORMATIQUE");
-        Console.WriteLine("========================================");
-        Console.ResetColor();
-        Console.WriteLine("\nBienvenue dans Code Quest !\n");
-        Console.WriteLine("Réponds correctement aux questions");
-        Console.WriteLine("d'informatique pour vaincre tes ennemis.\n");
+        int h = Console.WindowHeight;
+        CenterWrite("========================================", h / 2 - 6, ConsoleColor.Cyan);
+        CenterWrite("⚔   CODE QUEST   ⚔", h / 2 - 4, ConsoleColor.Cyan);
+        CenterWrite("LE RPG QUIZ INFORMATIQUE", h / 2 - 3, ConsoleColor.Cyan);
+        CenterWrite("========================================", h / 2 - 2, ConsoleColor.Cyan);
+        CenterWrite("Bienvenue dans Code Quest !", h / 2, ConsoleColor.White);
+        CenterWrite("Réponds correctement aux questions d'informatique", h / 2 + 2, ConsoleColor.Gray);
+        CenterWrite("pour vaincre tes ennemis.", h / 2 + 3, ConsoleColor.Gray);
+        CenterWrite("Utilise les flèches ↑ ↓ pour choisir, Entrée pour valider.", h / 2 + 5, ConsoleColor.DarkGray);
+        CenterWrite("Appuyez sur une touche pour commencer...", h - 2, ConsoleColor.DarkGray);
+        Console.ReadKey(true);
     }
 
     static int ChooseDifficulty()
     {
+        string[] options = { "1. Facile", "2. Normal", "3. Difficile" };
+        int selected = 0;
+
         while (true)
         {
-            Console.WriteLine("Choisis ta difficulté :\n");
-            Console.WriteLine("1. Facile");
-            Console.WriteLine("2. Normal");
-            Console.WriteLine("3. Difficile");
-            Console.Write("\nVotre choix : ");
-            string input = Console.ReadLine();
+            Console.Clear();
+            int h = Console.WindowHeight;
+            CenterWrite("Choisis ta difficulté", h / 2 - 4, ConsoleColor.Cyan);
 
-            if (input == "1" || input == "2" || input == "3")
-                return int.Parse(input);
+            for (int i = 0; i < options.Length; i++)
+            {
+                string line = "  " + options[i] + "  ";
+                if (i == selected)
+                    CenterWrite("▶ " + line, h / 2 + i, ConsoleColor.Black, ConsoleColor.Cyan);
+                else
+                    CenterWrite("  " + line, h / 2 + i, ConsoleColor.Gray);
+            }
 
-            Console.WriteLine("\nChoix invalide.\n");
+            CenterWrite("↑ ↓ pour choisir   •   Entrée pour valider", h - 2, ConsoleColor.DarkGray);
+            var key = Console.ReadKey(true).Key;
+
+            if (key == ConsoleKey.UpArrow)
+                selected = (selected - 1 + options.Length) % options.Length;
+            else if (key == ConsoleKey.DownArrow)
+                selected = (selected + 1) % options.Length;
+            else if (key == ConsoleKey.Enter)
+                return selected + 1;
         }
     }
 
-    static void PrintEnemyIntro(Enemy enemy)
+    static void ShowEnemyIntro(Enemy enemy)
     {
-        Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine("----------------------------------------");
-        Console.WriteLine($" Un ennemi apparaît : {enemy.Emoji} {enemy.Name}");
-        Console.WriteLine("----------------------------------------");
-        Console.ResetColor();
-        Thread.Sleep(500);
+        Console.Clear();
+        int h = Console.WindowHeight;
+        CenterWrite(new string('─', 44), h / 2 - 3, ConsoleColor.DarkYellow);
+        CenterWrite("Un ennemi apparaît !", h / 2 - 1, ConsoleColor.DarkYellow);
+        CenterWrite($"{enemy.Emoji}   {enemy.Name}   {enemy.Emoji}", h / 2 + 1, ConsoleColor.DarkYellow);
+        CenterWrite(new string('─', 44), h / 2 + 3, ConsoleColor.DarkYellow);
+        CenterWrite("Appuyez sur une touche pour continuer...", h - 2, ConsoleColor.DarkGray);
+        Console.ReadKey(true);
     }
 
-    static void PrintStatus(int playerHp, int playerMaxHp, int level, Enemy enemy)
+    static void ShowLevelUp(int level, int oldMaxHp, int newMaxHp)
     {
-        Console.WriteLine($"Niveau {level} PV : {playerHp}/{playerMaxHp} | {enemy.Emoji} {enemy.Name} PV : {Math.Max(enemy.Hp, 0)}/{enemy.MaxHp}\n");
+        Console.Clear();
+        int h = Console.WindowHeight;
+        CenterWrite("⭐   LEVEL UP !   ⭐", h / 2 - 2, ConsoleColor.Magenta);
+        CenterWrite($"Vous êtes maintenant niveau {level} !", h / 2, ConsoleColor.Magenta);
+        CenterWrite($"PV maximum : {oldMaxHp} → {newMaxHp}", h / 2 + 2, ConsoleColor.Magenta);
+        CenterWrite("Appuyez sur une touche pour continuer...", h - 2, ConsoleColor.DarkGray);
+        Console.ReadKey(true);
+        while (Console.KeyAvailable) Console.ReadKey(true);
     }
 
-    static (bool correct, string correctAnswerText) AskQuestion(Question q)
+    static void ShowEnemyDefeated(Enemy enemy, int gainedXp)
     {
-        // Copier et mélanger les réponses
-        string[] shuffledAnswers = (string[])q.Answers.Clone();
-        ShuffleArray(shuffledAnswers);
-
-        // Trouver le nouvel index de la bonne réponse
-        int newCorrectIndex = Array.IndexOf(shuffledAnswers, q.Answers[q.CorrectIndex]);
-
-        Console.WriteLine("----------------------------------------");
-        Console.WriteLine(" QUESTION");
-        Console.WriteLine("----------------------------------------\n");
-        Console.WriteLine(q.Text + "\n");
-
-        for (int i = 0; i < shuffledAnswers.Length; i++)
-            Console.WriteLine($"{i + 1}. {shuffledAnswers[i]}");
-
-        int choice = -1;
-        while (choice < 1 || choice > 4)
-        {
-            Console.Write("\nVotre réponse : ");
-            string input = Console.ReadLine();
-            int.TryParse(input, out choice);
-            if (choice < 1 || choice > 4)
-                Console.WriteLine("Entrez un nombre entre 1 et 4.");
-        }
-
-        bool isCorrect = (choice - 1 == newCorrectIndex);
-        string correctAnswerText = $"{newCorrectIndex + 1}. {shuffledAnswers[newCorrectIndex]}";
-
-        return (isCorrect, correctAnswerText);
+        Console.Clear();
+        int h = Console.WindowHeight;
+        CenterWrite($"{enemy.Name} VAINCU !", h / 2 - 2, ConsoleColor.Cyan);
+        CenterWrite($"+{gainedXp} XP", h / 2, ConsoleColor.Cyan);
+        CenterWrite("Appuyez sur une touche pour continuer...", h - 2, ConsoleColor.DarkGray);
+        Console.ReadKey(true);
+        while (Console.KeyAvailable) Console.ReadKey(true);
     }
 
     static void ShowVictory(int level, int correct, int wrong)
     {
         Console.Clear();
+        int h = Console.WindowHeight;
         int total = correct + wrong;
         int score = total == 0 ? 0 : (int)Math.Round(100.0 * correct / total);
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("========================================");
-        Console.WriteLine(" VICTOIRE !");
-        Console.WriteLine("========================================");
-        Console.ResetColor();
-        Console.WriteLine("\nVous avez vaincu le Boss !\n");
-        Console.WriteLine($"Niveau : {level}");
-        Console.WriteLine($"Bonnes réponses : {correct}");
-        Console.WriteLine($"Mauvaises réponses : {wrong}");
-        Console.WriteLine($"\nScore : {score}%\n");
-        Console.WriteLine("========================================");
-        Console.WriteLine(" MERCI D'AVOIR JOUÉ !");
-        Console.WriteLine("========================================\n");
 
-        if (score < 50)
-            Console.WriteLine("Il reste encore quelques bugs à corriger ! 🐛");
-        else if (score < 80)
-            Console.WriteLine("Pas mal ! Ton code compile presque ! 💻");
-        else
-            Console.WriteLine("Excellent ! Tu as clairement le niveau pour coder ! 🚀");
+        CenterWrite("========================================", h / 2 - 6, ConsoleColor.Green);
+        CenterWrite("VICTOIRE !", h / 2 - 4, ConsoleColor.Green);
+        CenterWrite("========================================", h / 2 - 3, ConsoleColor.Green);
+        CenterWrite("Vous avez vaincu le Boss !", h / 2 - 1, ConsoleColor.Green);
+        CenterWrite($"Niveau : {level}", h / 2 + 1, ConsoleColor.White);
+        CenterWrite($"Bonnes réponses : {correct}", h / 2 + 2, ConsoleColor.White);
+        CenterWrite($"Mauvaises réponses : {wrong}", h / 2 + 3, ConsoleColor.White);
+        CenterWrite($"Score : {score}%", h / 2 + 5, ConsoleColor.Yellow);
+
+        string finalMsg = score < 50 ? "Il reste encore quelques bugs à corriger ! 🐛"
+            : score < 80 ? "Pas mal ! Ton code compile presque ! 💻"
+            : "Excellent ! Tu as clairement le niveau pour coder ! 🚀";
+        CenterWrite(finalMsg, h - 3, ConsoleColor.Cyan);
+        CenterWrite("Appuyez sur une touche pour quitter...", h - 1, ConsoleColor.DarkGray);
+        Console.ReadKey(true);
     }
 
     static void ShowGameOver(int level, int correct, int wrong)
     {
         Console.Clear();
+        int h = Console.WindowHeight;
         int total = correct + wrong;
         int score = total == 0 ? 0 : (int)Math.Round(100.0 * correct / total);
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("========================================");
-        Console.WriteLine(" GAME OVER");
-        Console.WriteLine("========================================");
-        Console.ResetColor();
-        Console.WriteLine("\nVous avez été vaincu...\n");
-        Console.WriteLine($"Niveau : {level}");
-        Console.WriteLine($"Bonnes réponses : {correct}");
-        Console.WriteLine($"Mauvaises réponses : {wrong}");
-        Console.WriteLine($"\nScore : {score}%\n");
-        Console.WriteLine("========================================");
-        Console.WriteLine(" MERCI D'AVOIR JOUÉ !");
-        Console.WriteLine("========================================");
+
+        CenterWrite("========================================", h / 2 - 6, ConsoleColor.Red);
+        CenterWrite("GAME OVER", h / 2 - 4, ConsoleColor.Red);
+        CenterWrite("========================================", h / 2 - 3, ConsoleColor.Red);
+        CenterWrite("Vous avez été vaincu...", h / 2 - 1, ConsoleColor.Red);
+        CenterWrite($"Niveau : {level}", h / 2 + 1, ConsoleColor.White);
+        CenterWrite($"Bonnes réponses : {correct}", h / 2 + 2, ConsoleColor.White);
+        CenterWrite($"Mauvaises réponses : {wrong}", h / 2 + 3, ConsoleColor.White);
+        CenterWrite($"Score : {score}%", h / 2 + 5, ConsoleColor.Yellow);
+        CenterWrite("Appuyez sur une touche pour quitter...", h - 1, ConsoleColor.DarkGray);
+        Console.ReadKey(true);
     }
+
+    // ------------------------------------------------------------------
+    // LOGIQUE
+    // ------------------------------------------------------------------
 
     static void Shuffle<T>(List<T> list)
     {
