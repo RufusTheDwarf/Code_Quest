@@ -1,0 +1,15 @@
+C:\Users\pv52wcl\Desktop\Code_Quest\bin\Debug\net8.0\CodeQuest.exe
+C:\Users\pv52wcl\Desktop\Code_Quest\bin\Debug\net8.0\CodeQuest.deps.json
+C:\Users\pv52wcl\Desktop\Code_Quest\bin\Debug\net8.0\CodeQuest.runtimeconfig.json
+C:\Users\pv52wcl\Desktop\Code_Quest\bin\Debug\net8.0\CodeQuest.dll
+C:\Users\pv52wcl\Desktop\Code_Quest\bin\Debug\net8.0\CodeQuest.pdb
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\CodeQuest.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\CodeQuest.AssemblyInfoInputs.cache
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\CodeQuest.AssemblyInfo.cs
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\CodeQuest.csproj.CoreCompileInputs.cache
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\CodeQuest.sourcelink.json
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\CodeQuest.dll
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\refint\CodeQuest.dll
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\CodeQuest.pdb
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\CodeQuest.genruntimeconfig.cache
+C:\Users\pv52wcl\Desktop\Code_Quest\obj\Debug\net8.0\ref\CodeQuest.dll
