@@ -25,6 +25,12 @@ class Program
     static Random rng = new Random();
     const int BarWidth = 30;
 
+    // Mémorise la dernière taille connue de la console pour ne re-clear
+    // l'écran que lorsqu'elle change réellement (évite le scintillement
+    // tout en gérant proprement un redimensionnement en cours de partie).
+    static int lastKnownWidth = -1;
+    static int lastKnownHeight = -1;
+
     static void Main()
     {
         try
@@ -123,13 +129,16 @@ class Program
 
                 // Écran de feedback
                 Console.Clear();
-                DrawGameScreen(enemy, q.Text, shuffledAnswers,
+                int lastY = DrawGameScreen(enemy, q.Text, shuffledAnswers,
                     correct ? newCorrectIndex : selected,
                     playerHp, playerMaxHp, level, xp, message, msgColor, newCorrectIndex);
 
-                // Explication en bas
-                CenterWrite(q.Explanation, Console.WindowHeight - 5, ConsoleColor.DarkGray);
-                CenterWrite("Appuyez sur une touche pour continuer...", Console.WindowHeight - 2, ConsoleColor.DarkGray);
+                // Explication, ancrée juste sous le bloc centré (pas au bas
+                // de la fenêtre) afin que tout reste centré ensemble.
+                int explY = Math.Min(lastY + 2, Console.WindowHeight - 2);
+                int continueY = Math.Min(lastY + 4, Console.WindowHeight - 1);
+                CenterWrite(q.Explanation, explY, ConsoleColor.DarkGray);
+                CenterWrite("Appuyez sur une touche pour continuer...", continueY, ConsoleColor.DarkGray);
                 Console.ReadKey(true);
 
                 // Vider le buffer clavier pour éviter les pressions résiduelles
@@ -204,7 +213,7 @@ class Program
     // ÉCRAN DE JEU PRINCIPAL
     // ------------------------------------------------------------------
 
-    static void DrawGameScreen(Enemy enemy, string questionText, string[] answers,
+    static int DrawGameScreen(Enemy enemy, string questionText, string[] answers,
         int selected, int playerHp, int playerMaxHp, int level, int xp,
         string message, ConsoleColor messageColor, int correctAnswerIndex)
     {
@@ -212,22 +221,41 @@ class Program
         int h = Console.WindowHeight;
         int sepWidth = Math.Min(w - 10, 70);
 
-        // En-tête : niveau + XP
-        CenterWrite($"⚔   Niveau {level}      XP : {xp}", 1, ConsoleColor.Cyan);
+        // Si la fenêtre a été redimensionnée depuis la dernière frame, on
+        // efface tout pour ne laisser aucun résidu de l'ancien centrage.
+        if (w != lastKnownWidth || h != lastKnownHeight)
+        {
+            Console.Clear();
+            lastKnownWidth = w;
+            lastKnownHeight = h;
+        }
 
-        // Ennemi au milieu-haut
-        CenterWrite($"{enemy.Emoji}   {enemy.Name}   {enemy.Emoji}", 3, ConsoleColor.DarkYellow);
+        // Hauteur totale du bloc de jeu (en-tête → aide en bas), quel que
+        // soit le nombre de réponses. Sert à le centrer verticalement.
+        int blockHeight = 16 + answers.Length;
+        int y = Math.Max(0, (h - blockHeight) / 2);
+
+        // En-tête : niveau + XP
+        CenterWrite($"⚔   Niveau {level}      XP : {xp}", y, ConsoleColor.Cyan);
+        y += 2;
+
+        // Ennemi
+        CenterWrite($"{enemy.Emoji}   {enemy.Name}   {enemy.Emoji}", y, ConsoleColor.DarkYellow);
+        y += 1;
         string eBar = MakeHpBar(Math.Max(enemy.Hp, 0), enemy.MaxHp, BarWidth);
-        CenterWrite($"[{eBar}]   {Math.Max(enemy.Hp, 0)}/{enemy.MaxHp}", 4, ConsoleColor.Red);
+        CenterWrite($"[{eBar}]   {Math.Max(enemy.Hp, 0)}/{enemy.MaxHp}", y, ConsoleColor.Red);
+        y += 2;
 
         // Séparateur
-        CenterWrite(new string('─', sepWidth), 6, ConsoleColor.DarkGray);
+        CenterWrite(new string('─', sepWidth), y, ConsoleColor.DarkGray);
+        y += 2;
 
         // Question
-        CenterWrite(questionText, 8, ConsoleColor.White);
+        CenterWrite(questionText, y, ConsoleColor.White);
+        y += 2;
 
         // Réponses
-        int answersY = 10;
+        int answersY = y;
         for (int i = 0; i < answers.Length; i++)
         {
             string line = $"  {i + 1}. {answers[i]}  ";
@@ -240,28 +268,28 @@ class Program
             else
                 CenterWrite("  " + line, answersY + i, ConsoleColor.Gray);
         }
+        y = answersY + answers.Length + 1;
 
         // Séparateur bas
-        int sep2Y = answersY + answers.Length + 1;
-        CenterWrite(new string('─', sepWidth), sep2Y, ConsoleColor.DarkGray);
+        CenterWrite(new string('─', sepWidth), y, ConsoleColor.DarkGray);
+        y += 2;
 
-        // Joueur : barre de vie en bas au centre
-        CenterWrite("VOUS", sep2Y + 2, ConsoleColor.Green);
+        // Joueur : barre de vie
+        CenterWrite("VOUS", y, ConsoleColor.Green);
+        y += 1;
         string pBar = MakeHpBar(playerHp, playerMaxHp, BarWidth);
-        CenterWrite($"[{pBar}]   {playerHp}/{playerMaxHp}", sep2Y + 3, ConsoleColor.Green);
+        CenterWrite($"[{pBar}]   {playerHp}/{playerMaxHp}", y, ConsoleColor.Green);
+        y += 2;
 
-        // Message / aide en bas
+        // Message / aide — fait maintenant partie du bloc centré au lieu
+        // d'être figé en bas de la fenêtre (h - 3).
+        try { Console.SetCursorPosition(0, Math.Min(y, h - 1)); Console.Write(new string(' ', w)); } catch { }
         if (!string.IsNullOrEmpty(message))
-        {
-            // Effacer la ligne puis afficher le message
-            try { Console.SetCursorPosition(0, h - 3); Console.Write(new string(' ', w)); } catch { }
-            CenterWrite(message, h - 3, messageColor);
-        }
+            CenterWrite(message, y, messageColor);
         else
-        {
-            try { Console.SetCursorPosition(0, h - 3); Console.Write(new string(' ', w)); } catch { }
-            CenterWrite("↑ ↓ pour choisir   •   Entrée pour valider", h - 3, ConsoleColor.DarkGray);
-        }
+            CenterWrite("↑ ↓ pour choisir   •   Entrée pour valider", y, ConsoleColor.DarkGray);
+
+        return y;
     }
 
     // ------------------------------------------------------------------
