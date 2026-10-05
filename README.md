@@ -2,283 +2,283 @@
 
 # 🎮 Code Quest
 
-### Le RPG qui teste ta culture informatique
+**The RPG that tests your computer science knowledge.**
 
-![Release](https://img.shields.io/github/v/release/RufusTheDwarf/Code_Quest?style=flat-square&label=Release&color=blueviolet&logo=github) ![Plateforme](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?style=flat-square&logo=windows11&logoColor=white) ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet&logoColor=white) ![Licence](https://img.shields.io/badge/Licence-MIT-3DA639?style=flat-square&logo=opensourceinitiative&logoColor=white) ![Téléchargements](https://img.shields.io/github/downloads/RufusTheDwarf/Code_Quest/latest/total?style=flat-square&label=T%C3%A9l%C3%A9chargements&color=brightgreen&logo=github)
+*A console RPG where you fight bugs, viruses, and hackers by answering computer science questions.*
+
+[![C#](https://img.shields.io/badge/C%23-239120?style=flat&logo=csharp&logoColor=white)](#)
+[![.NET 8](https://img.shields.io/badge/.NET-8-512BD4?style=flat&logo=dotnet&logoColor=white)](#)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?style=flat&logo=windows&logoColor=white)](#)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat)](#)
+
+<br>
+
+[![Stars](https://img.shields.io/github/stars/RufusTheDwarf/Code_Quest?style=flat&color=yellow)](https://github.com/RufusTheDwarf/Code_Quest/stargazers)
+[![Forks](https://img.shields.io/github/forks/RufusTheDwarf/Code_Quest?style=flat&color=blue)](https://github.com/RufusTheDwarf/Code_Quest/forks)
+[![Issues](https://img.shields.io/github/issues/RufusTheDwarf/Code_Quest?style=flat&color=red)](https://github.com/RufusTheDwarf/Code_Quest/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/RufusTheDwarf/Code_Quest?style=flat&color=orange)](https://github.com/RufusTheDwarf/Code_Quest/commits/main)
 
 </div>
 
 ---
 
-<div align="center">
+## 📖 Concept
 
-> **Le quiz qui transforme tes connaissances en arme.**
-> Un RPG console où tu affrontes des bugs, virus et hackers en répondant à des questions d'informatique.
+**Code Quest** is a console role-playing game (RPG) where you play as a developer fighting computer science enemies. Each enemy represents a concept or problem from the world of code: a **Bug**, a **Malware**, a **Hacker**, a **Segmentation Fault**, and even the final boss, **The Compiler**.
 
-</div>
+To defeat your enemies, you must correctly answer computer science questions. Each correct answer deals damage. Each wrong answer costs you health points. Gain XP, level up, and become the master of code.
 
----
-
-## 📖 Table des matières
-
-- [🎯 Concept](#-concept)
-- [✨ Fonctionnalités](#-fonctionnalités)
-- [🕹️ Comment jouer](#️-comment-jouer)
-- [📥 Installation rapide](#-installation-rapide)
-- [🛠️ Installation pour les développeurs](#️-installation-pour-les-développeurs)
-- [📁 Structure du projet](#-structure-du-projet)
-- [🎓 Ce que tu vas apprendre](#-ce-que-tu-vas-apprendre)
-- [🗺️ Feuille de route](#️-feuille-de-route)
-- [🤝 Contribution](#-contribution)
-- [📜 Licence](#-licence)
-- [🙏 Remerciements](#-remerciements)
+The project is built in **C# / .NET 8** and runs entirely in the terminal. It is designed to be easy to launch, fun to play, and educational without feeling like a quiz.
 
 ---
 
-## 🎯 Concept
+## ✨ Features
 
-**Code Quest** est un jeu de rôle (RPG) en console où tu incarnes un développeur affrontant des ennemis informatiques. Chaque ennemi représente un concept ou un problème du monde du code : un **Bug**, un **Malware**, un **Hacker**, une **Segmentation Fault**… et même le boss final, **The Compiler**.
-
-Pour vaincre tes ennemis, tu dois répondre correctement à des questions d'informatique. Chaque bonne réponse leur inflige des dégâts. Chaque mauvaise réponse te coûte des points de vie. Gagne de l'XP, monte de niveau, et deviens le maître du code !
-
-Le projet est développé en **C# / .NET 8** et fonctionne entièrement dans le terminal. Il est conçu pour être simple à lancer, amusant à jouer, et pédagogique sans en avoir l'air.
-
----
-
-## ✨ Fonctionnalités
-
-| Fonctionnalité | Description |
-|:---|:---|
-| 🎮 **Interface de jeu complète** | Écran centré, barres de vie, ennemis au milieu de la console. Une vraie expérience de jeu, pas un simple quiz. |
-| ⬆️ **Navigation aux flèches** | Choisis tes réponses avec ↑ ↓ et valide avec Entrée. Pas besoin d'écrire quoi que ce soit. |
-| 🔀 **Réponses mélangées** | Les bonnes réponses changent de position à chaque partie. Impossible d'apprendre les réponses par cœur. |
-| 🐛 **5 ennemis uniques** | Bug, Malware, Hacker, Segmentation Fault, et le boss final *The Compiler*. Chacun a sa propre barre de vie. |
-| ⭐ **Système de niveaux et d'XP** | Gagne 20 XP par ennemi vaincu. Monte de niveau tous les 40 XP et augmente tes PV maximum. |
-| 🎯 **3 niveaux de difficulté** | Facile, Normal, Difficile. Chaque niveau débloque de nouvelles questions et des ennemis plus coriaces. |
-| 📚 **Plus de 50 questions** | Couvrant le matériel, les réseaux, la programmation, la cybersécurité et les outils de développement. |
-| 🧠 **Explications pédagogiques** | Après chaque réponse, une explication t'aide à comprendre la bonne réponse. |
-| 💚 **Exécutable autonome** | Le jeu est compilé en un seul fichier `.exe` qui fonctionne sans aucune installation. |
-| 🪟 **Compatible Windows 10 / 11** | Testé et fonctionnel sur les versions 64 bits de Windows. |
+| Feature | Description |
+|---|---|
+| **Full game interface** | Centered screen, health bars, enemies in the middle of the console. A real game experience, not just a quiz. |
+| **Arrow key navigation** | Choose answers with ↑ ↓ and confirm with Enter. No typing required. |
+| **Shuffled answers** | Correct answers change position every game. Impossible to memorize. |
+| **5 unique enemies** | Bug, Malware, Hacker, Segmentation Fault, and the final boss, The Compiler. Each has its own health bar. |
+| **Level and XP system** | Gain 20 XP per defeated enemy. Level up every 40 XP and increase your max HP. |
+| **3 difficulty levels** | Easy, Normal, Hard. Each level unlocks new questions and tougher enemies. |
+| **50+ questions** | Covering hardware, networking, programming, cybersecurity, and developer tools. |
+| **Educational explanations** | After each answer, an explanation helps you understand the correct choice. |
+| **Standalone executable** | The game is compiled into a single `.exe` file that runs without any installation. |
+| **Windows 10 / 11 compatible** | Tested and working on 64-bit versions of Windows. |
 
 ---
 
-## 🕹️ Comment jouer
+## 🎮 How to Play
 
-Voici à quoi ressemble le jeu en cours de partie :
+Here is what the game looks like during a session:
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │                                                     │
-│   🐛   Bug   🐛                                     │
-│   [████████░░░░░░░░]   2/3                          │
+│  Bug                                                │
+│  [████████░░░░░░░░] 2/3                             │
 │                                                     │
-│   ─────────────────────────────────────────────     │
+│  ─────────────────────────────────────────────      │
 │                                                     │
-│   Que signifie CPU ?                                │
+│  What does CPU stand for?                           │
 │                                                     │
-│   ▶ 1. Central Processing Unit                      │
-│     2. Computer Personal User                       │
-│     3. Central Program Utility                      │
+│  ▶ 1. Central Processing Unit                       │
+│    2. Computer Personal User                        │
+│    3. Central Program Utility                       │
 │                                                     │
-│   ─────────────────────────────────────────────     │
+│  ─────────────────────────────────────────────      │
 │                                                     │
-│   VOUS                                              │
-│   [████████████████]   5/5                          │
+│  YOU                                                │
+│  [████████████████] 5/5                             │
 │                                                     │
-│   ↑ ↓ pour choisir  •  Entrée pour valider          │
+│  ↑ ↓ to choose • Enter to confirm                   │
 │                                                     │
 └─────────────────────────────────────────────────────┘
 ```
 
-### 🎮 Commandes
+### Controls
 
-| Touche | Action |
-|:---:|:---|
-| **↑ ↓** | Choisir une réponse |
-| **Entrée** | Valider la réponse sélectionnée |
+| Key | Action |
+|---|---|
+| **↑ ↓** | Choose an answer |
+| **Enter** | Confirm the selected answer |
 
-### 🧠 Règles du jeu
+### Rules
 
-- **Bonne réponse** → L'ennemi perd 1 PV, tu gagnes 20 XP.
-- **Mauvaise réponse** → Tu perds 1 PV.
-- **Ennemi vaincu** → +20 XP. Si tu passes un palier d'XP, tu montes de niveau et tes PV max augmentent.
-- **Tous les ennemis vaincus** → Victoire ! 🎉
-
----
-
-## 📥 Installation rapide
-
-**Pour les joueurs : la méthode la plus simple.**
-
-1. Va dans la section **[Releases](https://github.com/RufusTheDwarf/Code_Quest/releases)** de ce dépôt.
-2. Télécharge le fichier **`CodeQuest.exe`** (≈ 67 Mo) dans la section **Assets** de la dernière version.
-3. Double-clique sur le fichier téléchargé.
-
-C'est tout. Le jeu se lance immédiatement.
-
-> 💡 **Aucun prérequis.** Ni .NET, ni Git, ni Visual Studio. Le fichier `.exe` est autonome et contient tout ce qu'il faut pour fonctionner.
+- **Correct answer** → The enemy loses 1 HP, you gain 20 XP.
+- **Wrong answer** → You lose 1 HP.
+- **Enemy defeated** → +20 XP. If you cross an XP threshold, you level up and your max HP increases.
+- **All enemies defeated** → Victory!
 
 ---
 
-## 🛠️ Installation pour les développeurs
+## 🚀 Quick Start
 
-**Pour ceux qui veulent modifier le code, compiler le projet ou contribuer.**
+**For players: the simplest method.**
 
-### Prérequis
+1. Go to the **[Releases](https://github.com/RufusTheDwarf/Code_Quest/releases)** section of this repository.
+2. Download the **`CodeQuest.exe`** file (≈ 67 MB) from the **Assets** section of the latest release.
+3. Double-click the downloaded file.
 
-- **.NET 8 SDK** ou version ultérieure // [Télécharger ici](https://dotnet.microsoft.com/download/dotnet/8.0)
-- **Git** // [Télécharger ici](https://git-scm.com/downloads)
-- Un terminal (Git Bash, PowerShell, Windows Terminal, etc.)
+That's it. The game launches immediately.
 
-### Étapes
+> **No prerequisites.** No .NET, no Git, no Visual Studio. The `.exe` file is standalone and contains everything it needs to run.
+
+---
+
+## 🛠️ Developer Setup
+
+**For those who want to modify the code, compile the project, or contribute.**
+
+### Prerequisites
+
+- **.NET 8 SDK** or later : [Download here](https://dotnet.microsoft.com/download/dotnet/8.0)
+- **Git** : [Download here](https://git-scm.com/downloads)
+- A terminal (Git Bash, PowerShell, Windows Terminal, etc.)
+
+### Steps
 
 ```bash
-# 1. Cloner le dépôt
+# 1. Clone the repository
 git clone https://github.com/RufusTheDwarf/Code_Quest.git
 
-# 2. Entrer dans le dossier
+# 2. Enter the folder
 cd Code_Quest
 
-# 3. Lancer le jeu en mode développement
+# 3. Run the game in development mode
 dotnet run
 
-# 4. OU compiler une version Release
+# 4. OR compile a Release version
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
 ```
 
-L'exécutable compilé se trouve dans :
+The compiled executable will be in:
+
 ```
 bin/Release/net8.0/win-x64/publish/CodeQuest.exe
 ```
 
-### Lanceur automatique
+### Automatic Launcher
 
-Un fichier **`JOUER.bat`** est inclus à la racine du projet. Il effectue automatiquement :
+A **`JOUER.bat`** file is included at the root of the project. It automatically performs the following:
 
-1. La vérification et l'installation locale de .NET (dans `.dotnet/`).
-2. La compilation du jeu.
-3. La création d'un raccourci **"Code Quest"** sur le Bureau.
-4. Le lancement du jeu.
+1. Checks and installs .NET locally (in `.dotnet/`).
+2. Compiles the game.
+3. Creates a **"Code Quest"** shortcut on your Desktop.
+4. Launches the game.
 
-Double-clique simplement sur `JOUER.bat` pour tout faire en une seule fois.
+Simply double-click `JOUER.bat` to do everything in one go.
 
 ---
 
-## 📁 Structure du projet
+## 📁 Project Structure
 
-```
+```text
 Code_Quest/
 │
-├── Program.cs              # Code source principal du jeu
-├── CodeQuest.csproj        # Fichier de configuration du projet .NET
-├── JOUER.bat               # Lanceur automatique pour développeurs
-├── .gitignore              # Fichiers exclus du suivi Git
-├── README.md               # Ce fichier
+├── Program.cs              # Main game source code
+├── CodeQuest.csproj        # .NET project configuration file
+├── JOUER.bat               # Automatic launcher for developers
+├── .gitignore              # Files excluded from Git tracking
+├── README.md               # This file
 │
-├── .dotnet/                # SDK .NET portable (généré par JOUER.bat, ignoré par Git)
-│
-└── bin/                    # Fichiers compilés (généré, ignoré par Git)
+├── .dotnet/                # Portable .NET SDK (generated by JOUER.bat, ignored by Git)
+└── bin/                    # Compiled files (generated, ignored by Git)
     └── Release/
         └── net8.0/
             └── win-x64/
                 └── publish/
-                    └── CodeQuest.exe   # Exécutable final
+                    └── CodeQuest.exe   # Final executable
 ```
 
 ---
 
-## 🎓 Ce que tu vas apprendre
+## 📚 What You Will Learn
 
-En jouant à Code Quest, tu révises (ou découvres) des notions essentielles en informatique :
+By playing Code Quest, you review (or discover) essential computer science concepts:
 
-| Thème | Exemples de questions |
-|:---|:---|
-| 🖥️ **Matériel** | CPU, RAM, carte graphique, disque dur, USB, Wi-Fi… |
-| 🌐 **Réseaux** | Adresse IP, DNS, HTTP/HTTPS, TCP/UDP, modèle OSI, LAN… |
-| 💻 **Programmation** | Algorithmes, récursivité, POO, complexité O(n), pointeurs… |
-| 🔒 **Cybersécurité** | Chiffrement asymétrique, injection SQL, hachage, mots de passe… |
-| 🛠️ **Outils de développement** | Git, terminaux, API REST, machines virtuelles, compilateurs… |
-
----
-
-## 🗺️ Feuille de route
-
-Voici ce qui est prévu pour les prochaines versions :
-
-- [x] Interface de jeu centrée avec barres de vie
-- [x] Navigation aux flèches pour choisir les réponses
-- [x] Mélange aléatoire des réponses
-- [x] Système de niveaux et d'XP
-- [x] 3 niveaux de difficulté
-- [x] Plus de 50 questions
-- [ ] Mode multijoueur local (2 joueurs sur le même clavier)
-- [ ] Système de sauvegarde de la progression
-- [ ] Nouvelles catégories de questions (bases de données, cloud, IA)
-- [ ] Sprites ASCII améliorés pour les ennemis
-- [ ] Effets sonores et musique de fond
-- [ ] Support de Linux et macOS
-
-> 💡 Une idée ? Ouvre une **[issue](https://github.com/RufusTheDwarf/Code_Quest/issues)** pour la proposer !
+| Theme | Example questions |
+|---|---|
+| **Hardware** | CPU, RAM, graphics card, hard drive, USB, Wi-Fi… |
+| **Networking** | IP address, DNS, HTTP/HTTPS, TCP/UDP, OSI model, LAN… |
+| **Programming** | Algorithms, recursion, OOP, O(n) complexity, pointers… |
+| **Cybersecurity** | Asymmetric encryption, SQL injection, hashing, passwords… |
+| **Developer tools** | Git, terminals, REST APIs, virtual machines, compilers… |
 
 ---
 
-## 🤝 Contribution
+## 🗺️ Roadmap
 
-Les contributions sont les bienvenues ! Voici comment participer :
+Here is what is planned for future versions:
 
-1. **Fork** le dépôt.
-2. Crée une branche pour ta fonctionnalité :
+- [x] Centered game interface with health bars
+- [x] Arrow key navigation to choose answers
+- [x] Random shuffling of answers
+- [x] Level and XP system
+- [x] 3 difficulty levels
+- [x] 50+ questions
+- [ ] Local multiplayer mode (2 players on the same keyboard)
+- [ ] Progress save system
+- [ ] New question categories (databases, cloud, AI)
+- [ ] Improved ASCII sprites for enemies
+- [ ] Sound effects and background music
+- [ ] Linux and macOS support
+
+> Have an idea? Open an **[issue](https://github.com/RufusTheDwarf/Code_Quest/issues)** to suggest it!
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Here is how to participate:
+
+1. **Fork** the repository.
+2. Create a branch for your feature:
    ```bash
-   git checkout -b feature/ma-super-fonctionnalite
+   git checkout -b feature/my-awesome-feature
    ```
-3. Fais tes modifications et commit :
+3. Make your changes and commit:
    ```bash
-   git commit -m "Ajout de ma super fonctionnalité"
+   git commit -m "Add my awesome feature"
    ```
-4. Pousse ta branche :
+4. Push your branch:
    ```bash
-   git push origin feature/ma-super-fonctionnalite
+   git push origin feature/my-awesome-feature
    ```
-5. Ouvre une **Pull Request** sur GitHub.
+5. Open a **Pull Request** on GitHub.
 
-### 💡 Idées de contribution
+### Contribution Ideas
 
-- Ajouter de nouvelles questions au jeu.
-- Améliorer l'interface console.
-- Corriger des bugs.
-- Traduire le jeu dans d'autres langues.
-- Écrire de la documentation.
+- Add new questions to the game.
+- Improve the console interface.
+- Fix bugs.
+- Translate the game into other languages.
+- Write documentation.
 
 ---
 
-## 📜 Licence
+## 📄 License
 
-Ce projet est distribué sous licence **MIT**. Tu es libre de l'utiliser, de le modifier et de le distribuer, tant que tu conserves la mention de copyright originale.
-
-Voir le fichier [`LICENSE`](LICENSE) pour plus de détails.
-
----
-
-## 🙏 Remerciements
-
-Merci à toutes les personnes qui testeront ce jeu, qui donneront leur avis, et qui contribueront à l'améliorer.
-
-Un merci tout particulier à la communauté **.NET** pour les outils et la documentation qui ont rendu ce projet possible.
+This project is distributed under the **MIT License**. You are free to use, modify, and distribute it, as long as you keep the original copyright notice. See the [`LICENSE`](https://github.com/RufusTheDwarf/Code_Quest/blob/main/LICENSE) file for details.
 
 ---
 
 <div align="center">
 
-**Fait avec ❤️ et beaucoup de café**
+### 👤 Author
 
-*"Talk is cheap. Show me the code."* — Linus Torvalds
+**RufusTheDwarf**
+
+[![GitHub](https://img.shields.io/badge/GitHub-RufusTheDwarf-181717?style=flat&logo=github&logoColor=white)](https://github.com/RufusTheDwarf)
+[![Repository](https://img.shields.io/badge/Repo-Code__Quest-2ea44f?style=flat&logo=git&logoColor=white)](https://github.com/RufusTheDwarf/Code_Quest)
 
 <br>
 
-⭐ **Si tu aimes ce projet, mets une étoile sur le dépôt !** ⭐
+### 💖 Acknowledgements
+
+Thanks to everyone who will test this game, give feedback, and help improve it.
+
+A special thanks to the **.NET community** for the tools and documentation that made this project possible.
 
 <br>
 
-![Visiteurs](https://visitor-badge.laobi.icu/badge?page_id=RufusTheDwarf.Code_Quest)
+### ⭐ Show Your Support
+
+If you like this project, consider giving it a star. It means a lot.
+
+[![Star this repo](https://img.shields.io/badge/⭐_Star_this_repo-yellow?style=flat)](https://github.com/RufusTheDwarf/Code_Quest/stargazers)
+[![Report an issue](https://img.shields.io/badge/🐛_Report_an_issue-red?style=flat)](https://github.com/RufusTheDwarf/Code_Quest/issues)
+[![Fork this repo](https://img.shields.io/badge/🍴_Fork_this_repo-blue?style=flat)](https://github.com/RufusTheDwarf/Code_Quest/fork)
+
+<br>
+
+---
+
+<sub>Made with ❤️ and a lot of coffee by **RufusTheDwarf** · Licensed under MIT · © 2026</sub>
+
+<br>
+
+*"Talk is cheap. Show me the code."* Linus Torvalds
 
 </div>
