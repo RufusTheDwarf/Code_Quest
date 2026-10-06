@@ -39,7 +39,7 @@ public static class Program
 
             int menuChoice = MainMenuScreen.Show();
             if (menuChoice == 3) { running = false; break; }
-            if (menuChoice != 0) continue; // Paramètres/Aide déjà gérés dans MainMenuScreen
+            if (menuChoice != 0) continue;
 
             Difficulty difficulty = DifficultyScreen.Show();
 
@@ -68,11 +68,29 @@ public static class Program
             var enemy = session.CurrentEnemy;
             if (enemy == null) break;
 
+            // Avertissement boss
+            if (enemy.IsBoss && !session.BossWarningShown)
+            {
+                BossWarningScreen.Show(session);
+                session.BossWarningShown = true;
+                FrameBuffer.SafeClear();
+            }
+
+            // Question bonus (avant ennemi 3)
+            if (!session.BonusQuestionAsked && session.CurrentEnemyIndex == 2)
+            {
+                BonusQuestionScreen.Show(session);
+                session.BonusQuestionAsked = true;
+                FrameBuffer.SafeClear();
+            }
+
+            // Combat
             var question = session.NextQuestion();
             var (shuffled, correctIndex) = session.ShuffleAnswers(question);
 
             int selected = 0;
             int displayCorrect = -1;
+            bool abandoned = false;
 
             FrameBuffer.SafeClear();
 
@@ -81,19 +99,41 @@ public static class Program
                 if (FrameBuffer.NeedsClear())
                     FrameBuffer.SafeClear();
 
-                CombatScreen.Draw(session, question, shuffled, selected, displayCorrect, null, ConsoleColor.White);
+                int reveal = session.HasVision ? correctIndex : -1;
+                CombatScreen.Draw(session, question, shuffled, selected, reveal, null, ConsoleColor.White);
                 var key = InputHandler.WaitKey();
+
+                if (key == ConsoleKey.Escape)
+                {
+                    int pauseResult = PauseMenuScreen.Show(session);
+                    if (pauseResult == 1) { abandoned = true; break; }
+                    if (pauseResult == 2) return 2;
+                    FrameBuffer.SafeClear();
+                    continue;
+                }
 
                 if (key == ConsoleKey.UpArrow) selected = (selected - 1 + shuffled.Length) % shuffled.Length;
                 else if (key == ConsoleKey.DownArrow) selected = (selected + 1) % shuffled.Length;
                 else if (key == ConsoleKey.Enter) break;
             }
 
+            if (abandoned) return 0;
+
             bool correct = (selected == correctIndex);
             string selectedAnswer = shuffled[selected];
 
-            if (correct) { player.CorrectCount++; enemy.Hp--; }
-            else { player.WrongCount++; player.Hp--; }
+            if (correct)
+            {
+                player.CorrectCount++;
+                int dmg = session.ComputeDamage();
+                enemy.Hp -= dmg;
+            }
+            else
+            {
+                player.WrongCount++;
+                if (!session.ConsumeShield())
+                    player.Hp--;
+            }
 
             FrameBuffer.SafeClear();
             displayCorrect = correctIndex;
@@ -101,6 +141,16 @@ public static class Program
 
             FeedbackScreen.Show(question, correct, selectedAnswer);
 
+            // ── Boss multi-phases ? ────────────────────────────
+            if (enemy.Hp <= 0 && enemy.CurrentPhase < enemy.TotalPhases)
+            {
+                enemy.CurrentPhase++;
+                enemy.Hp = enemy.MaxHp;
+                ExtremePhaseTransitionScreen.Show(enemy);
+                continue;
+            }
+
+            // ── Ennemi vaincu ? ───────────────────────────────
             if (enemy.IsDefeated)
             {
                 int oldLevel = player.Level;

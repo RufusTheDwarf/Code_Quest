@@ -11,8 +11,10 @@ public class Enemy
     public string Color { get; init; } = "White";
     public string DangerLevel { get; init; } = "";
     public bool IsBoss { get; init; }
+    public int TotalPhases { get; init; } = 1;
+    public int CurrentPhase { get; set; } = 1;
 
-    public bool IsDefeated => Hp <= 0;
+    public bool IsDefeated => Hp <= 0 && CurrentPhase >= TotalPhases;
 
     public Enemy Clone() => new()
     {
@@ -24,6 +26,8 @@ public class Enemy
         SpriteSmall = SpriteSmall,
         Color = Color,
         DangerLevel = DangerLevel,
-        IsBoss = IsBoss
+        IsBoss = IsBoss,
+        TotalPhases = TotalPhases,
+        CurrentPhase = 1
     };
 }

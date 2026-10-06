@@ -443,7 +443,9 @@ public static class EnemyCatalog
         {
             Name = "THE ARCHITECT",
             Description = "Le créateur du système. Il a écrit chaque ligne de ton destin.",
-            MaxHp = hp + 4, Hp = hp + 4, Color = "Magenta", DangerLevel = "★★★★★", IsBoss = true,
+            MaxHp = hp + 4, Hp = hp + 4, Color = "Magenta", DangerLevel = "★★★★★",
+            IsBoss = true,
+            TotalPhases = 3,
             SpriteLarge = new[]
             {
                 "       ▓▓▓▓▓▓▓▓▓▓▓       ",

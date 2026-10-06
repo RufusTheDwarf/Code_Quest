@@ -23,38 +23,51 @@ public static class CombatScreen
 
         if (enemy == null) return;
 
-        // ── Titre difficulté (haut) ────────────────────────────
-        int titleY = 1;
-        string title = $" {cfg.TitlePrefix} DIFFICULTÉ : {cfg.Name} {cfg.TitleSuffix} ";
-        if (title.Length > w - 2)
-            title = title.Substring(0, Math.Max(0, w - 2));
-        Panel.DrawCenteredText(title, titleY, AnsiPalette.FromName(cfg.Accent));
+        bool stressMode = cfg.IsMultiPhase && enemy.IsBoss;
 
-        // ── Sprite ennemi (décalé vers le bas) ─────────────────
+        // ── Bandeau haut (mode stress = décoré) ────────────────
+        int titleY = 1;
+        if (stressMode)
+        {
+            string stressBar = new string('▓', Math.Max(10, w - 4));
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            ConsoleLayout.SetCursor(2, titleY);
+            Console.Write(stressBar);
+            Console.ResetColor();
+            titleY++;
+        }
+
+        string title = $" {cfg.TitlePrefix} DIFFICULTÉ : {cfg.Name} {cfg.TitleSuffix} ";
+        if (stressMode) title += $"   ▓ PHASE {enemy.CurrentPhase}/{enemy.TotalPhases} ▓";
+        if (title.Length > w - 2) title = title.Substring(0, Math.Max(0, w - 2));
+        Panel.DrawCenteredText(title, titleY, stressMode ? ConsoleColor.Magenta : AnsiPalette.FromName(cfg.Accent));
+
+        // ── Sprite ennemi ──────────────────────────────────────
         int spriteH = enemy.SpriteLarge.Length;
         int spriteY = Math.Max(titleY + 2, h / 4);
-
-        // S'assurer qu'on a la place pour la suite (nom, barre, question, réponses)
         int reservedBelow = 16;
         if (spriteY + spriteH + reservedBelow > h - 10)
             spriteY = Math.Max(titleY + 2, h - 10 - reservedBelow - spriteH);
 
-        SpriteRenderer.DrawSprite(enemy.SpriteLarge, w / 2, spriteY, AnsiPalette.FromName(enemy.Color));
+        SpriteRenderer.DrawSprite(enemy.SpriteLarge, w / 2, spriteY,
+            stressMode ? ConsoleColor.Magenta : AnsiPalette.FromName(enemy.Color));
 
-        // ── Nom + barre de vie ennemi ──────────────────────────
+        // ── Nom + barre ennemi ─────────────────────────────────
         int infoY = spriteY + spriteH + 2;
-        Panel.DrawCenteredText(enemy.Name, infoY, AnsiPalette.FromName(enemy.Color));
+        Panel.DrawCenteredText(enemy.Name, infoY,
+            stressMode ? ConsoleColor.Magenta : AnsiPalette.FromName(enemy.Color));
 
         string eBar = MakeBar(enemy.Hp, enemy.MaxHp, 24);
-        string eBarLine = $"[{eBar}] {Math.Max(0, enemy.Hp)}/{enemy.MaxHp}";
-        Panel.DrawCenteredText(eBarLine, infoY + 1, ConsoleColor.Red);
+        Panel.DrawCenteredText($"[{eBar}] {Math.Max(0, enemy.Hp)}/{enemy.MaxHp}", infoY + 1, ConsoleColor.Red);
 
         // ── Séparateur ─────────────────────────────────────────
         int sepY = infoY + 3;
         int sepW = Math.Min(60, w - 8);
-        Panel.DrawSeparator(ConsoleLayout.CenterX(sepW), sepY, sepW, ConsoleColor.DarkGray, cfg.Separator[0]);
+        char sepChar = stressMode ? '▓' : cfg.Separator[0];
+        Panel.DrawSeparator(ConsoleLayout.CenterX(sepW), sepY, sepW,
+            stressMode ? ConsoleColor.DarkMagenta : ConsoleColor.DarkGray, sepChar);
 
-        // ── Question (wrappée) ─────────────────────────────────
+        // ── Question ───────────────────────────────────────────
         int qY = sepY + 2;
         var qLines = TextWrapper.Wrap(question.Text, Math.Min(w - 10, 70));
         foreach (var line in qLines)
@@ -64,7 +77,7 @@ public static class CombatScreen
             qY++;
         }
 
-        // ── Réponses : boîtes à LARGEUR FIXE ───────────────────
+        // ── Réponses ───────────────────────────────────────────
         qY += 1;
         int maxAnsLen = 0;
         foreach (var a in shuffledAnswers) if (a.Length > maxAnsLen) maxAnsLen = a.Length;
@@ -78,8 +91,6 @@ public static class CombatScreen
 
             string prefix = (i == selected) ? "▶ " : "  ";
             string content = prefix + shuffledAnswers[i];
-
-            // Tronquer / padder à boxW exactement
             if (content.Length > boxW) content = content.Substring(0, boxW);
             content = content.PadRight(boxW);
 
@@ -92,7 +103,7 @@ public static class CombatScreen
             }
             else if (i == selected)
             {
-                Console.BackgroundColor = ConsoleColor.DarkCyan;
+                Console.BackgroundColor = stressMode ? ConsoleColor.DarkMagenta : ConsoleColor.DarkCyan;
                 Console.ForegroundColor = ConsoleColor.Black;
             }
             else
@@ -110,38 +121,46 @@ public static class CombatScreen
         qY += 1;
         if (qY < h - 8)
         {
-            Panel.DrawSeparator(ConsoleLayout.CenterX(sepW), qY, sepW, ConsoleColor.DarkGray, cfg.Separator[0]);
+            Panel.DrawSeparator(ConsoleLayout.CenterX(sepW), qY, sepW,
+                stressMode ? ConsoleColor.DarkMagenta : ConsoleColor.DarkGray, sepChar);
             qY += 2;
         }
 
-        // ── Infos joueur (bas centre) ──────────────────────────
-        int playerY = Math.Min(qY, h - 6);
+        // ── Infos joueur ───────────────────────────────────────
+        int playerY = Math.Min(qY, h - 7);
         Panel.DrawCenteredText($"NIVEAU {player.Level}  •  XP : {player.Xp}", playerY, ConsoleColor.Cyan);
 
         string pBar = MakeBar(player.Hp, player.MaxHp, 24);
-        string pBarLine = $"[{pBar}] {player.Hp}/{player.MaxHp}";
         if (playerY + 1 < h - 1)
-            Panel.DrawCenteredText(pBarLine, playerY + 1, ConsoleColor.Green);
+            Panel.DrawCenteredText($"[{pBar}] {player.Hp}/{player.MaxHp}", playerY + 1, ConsoleColor.Green);
 
-        // ── Liste des ennemis (bas gauche) ─────────────────────
+        if (session.ActivePowerUps.Count > 0 && playerY + 2 < h - 1)
+        {
+            var icons = session.ActivePowerUps.Select(p => p.Icon).ToArray();
+            Panel.DrawCenteredText("POWERUPS : " + string.Join(" ", icons), playerY + 2, ConsoleColor.Magenta);
+        }
+
+        // ── Liste ennemis + map ────────────────────────────────
         DrawEnemyList(session);
-
-        // ── Map progression (bas gauche, sous la liste) ────────
         DrawProgressMap(session);
 
-        // ── Message ou aide (tout en bas) ──────────────────────
+        // ── Message / aide ─────────────────────────────────────
         int msgY = h - 2;
         if (!string.IsNullOrEmpty(message))
             Panel.DrawCenteredText(message, msgY, messageColor);
         else
-            Panel.DrawCenteredText("↑ ↓ pour choisir • Entrée pour valider", msgY, ConsoleColor.DarkGray);
+        {
+            string help = stressMode
+                ? "▓ ↑ ↓  •  Entrée  •  Échap pause ▓"
+                : "↑ ↓ pour choisir  •  Entrée  •  Échap pour pause";
+            Panel.DrawCenteredText(help, msgY, stressMode ? ConsoleColor.DarkMagenta : ConsoleColor.DarkGray);
+        }
     }
 
     private static void DrawEnemyList(GameSession session)
     {
         int listX = 2;
         int listCount = session.Enemies.Count;
-        // Placer la liste de sorte à laisser 2 lignes pour la map + 1 pour l'aide
         int listY = ConsoleLayout.Height - 3 - listCount - 1;
         if (listY < 2) return;
 
@@ -157,13 +176,11 @@ public static class CombatScreen
 
             var e = session.Enemies[i];
             bool isCurrent = (i == session.CurrentEnemyIndex);
-
             string line = (isCurrent ? "▶ " : "  ") + e.Name + (e.IsDefeated ? " ✓" : "");
 
             Console.ForegroundColor = e.IsDefeated ? ConsoleColor.DarkGray
                 : isCurrent ? AnsiPalette.FromName(e.Color)
                 : ConsoleColor.Gray;
-
             ConsoleLayout.SetCursor(listX, y);
             Console.Write(line);
             Console.ResetColor();
