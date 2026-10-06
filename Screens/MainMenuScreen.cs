@@ -1,4 +1,5 @@
 using CodeQuest.Rendering;
+using CodeQuest.Services;
 using CodeQuest.UI;
 
 namespace CodeQuest.Screens;
@@ -15,9 +16,10 @@ public static class MainMenuScreen
         "  ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝    ╚══▀▀═╝  ╚═════╝ ╚══════╝╚══════╝   ╚═╝   "
     };
 
+    // Retour : 0=Jouer, 1=Paramètres, 2=Aide, 3=Quitter
     public static int Show()
     {
-        string[] options = { "▶ JOUER", "  AIDE / RÈGLES", "  QUITTER" };
+        string[] options = { "▶ JOUER", "  PARAMÈTRES", "  AIDE / RÈGLES", "  QUITTER" };
         int selected = 0;
 
         FrameBuffer.SafeClear();
@@ -30,7 +32,16 @@ public static class MainMenuScreen
             int h = ConsoleLayout.Height;
             int w = ConsoleLayout.Width;
 
-            int logoY = Math.Max(2, h / 4 - 4);
+            // Bloc complet descendu de 15 lignes par rapport à la v1
+            // Clampé pour ne jamais dépasser le bas de l'écran
+            int contentHeight = 6 + 1 + 1 + (options.Length * 2) + 3;
+            int logoY = Math.Max(2, Math.Min(h - contentHeight - 1, h / 4 + 11));
+
+            // Bandeau décoratif
+            int decoY = Math.Max(1, logoY - 2);
+            int decoW = Math.Min(w - 4, 84);
+            Panel.DrawSeparator(ConsoleLayout.CenterX(decoW), decoY, decoW, ConsoleColor.DarkCyan, '═');
+
             for (int i = 0; i < Logo.Length; i++)
             {
                 int y = logoY + i;
@@ -43,9 +54,10 @@ public static class MainMenuScreen
             Console.ResetColor();
 
             int subtitleY = logoY + Logo.Length + 1;
-            Panel.DrawCenteredText("LE RPG DES DÉFIS INFORMATIQUES", subtitleY, ConsoleColor.DarkGray);
+            if (subtitleY < h)
+                Panel.DrawCenteredText("✦  LE RPG DES DÉFIS INFORMATIQUES  ✦", subtitleY, ConsoleColor.DarkGray);
 
-            int menuY = subtitleY + 3;
+            int menuY = subtitleY + 2;
             for (int i = 0; i < options.Length; i++)
             {
                 int y = menuY + i * 2;
@@ -66,13 +78,20 @@ public static class MainMenuScreen
                 }
             }
 
-            int helpY = Math.Min(h - 3, menuY + options.Length * 2 + 1);
-            Panel.DrawCenteredText("↑ ↓ pour choisir • Entrée pour valider", helpY, ConsoleColor.DarkGray);
+            int helpY = Math.Min(h - 3, menuY + options.Length * 2);
+            Panel.DrawCenteredText("↑ ↓ pour choisir  •  Entrée pour valider", helpY, ConsoleColor.DarkGray);
+
+            // Version + déblocage visible
+            var progress = ProgressService.Load();
+            string unlockInfo = progress.DevUnlocked ? "DEV" : "NORM";
+            int infoY = Math.Min(h - 1, helpY + 1);
+            Panel.DrawCenteredText($"v2.0  •  [{unlockInfo}]", infoY, ConsoleColor.DarkGray);
 
             if (Platform.FullscreenDetector.ShouldShowFullscreenHint())
             {
-                int warnY = Math.Min(h - 2, helpY + 1);
-                Panel.DrawCenteredText("Appuyez sur F11 pour passer en plein écran", warnY, ConsoleColor.Yellow);
+                int warnY = h - 2;
+                if (warnY > infoY)
+                    Panel.DrawCenteredText("Appuyez sur F11 pour passer en plein écran", warnY, ConsoleColor.Yellow);
             }
 
             var key = InputHandler.WaitKey();
@@ -81,8 +100,9 @@ public static class MainMenuScreen
             else if (key == ConsoleKey.Enter)
             {
                 if (selected == 0) return 0;
-                if (selected == 1) { ShowRules(); FrameBuffer.SafeClear(); continue; }
-                if (selected == 2) return 2;
+                if (selected == 1) { SettingsScreen.Show(); FrameBuffer.SafeClear(); continue; }
+                if (selected == 2) { ShowRules(); FrameBuffer.SafeClear(); continue; }
+                if (selected == 3) return 3;
             }
         }
     }
@@ -106,10 +126,9 @@ public static class MainMenuScreen
             "  ● Tous les 40 XP, tu montes de niveau et tes PV max",
             "    augmentent de 1.",
             "",
-            "  ● Vaincs tous les ennemis, y compris le boss final,",
-            "    pour remporter la victoire.",
+            "  ● Vaincs tous les ennemis pour remporter la victoire.",
             "",
-            "  ● ↑ ↓ pour choisir • Entrée pour valider.",
+            "  ● Échap pendant une partie ouvre le menu pause.",
             "",
             "  ● F11 pour passer en plein écran.",
             "",

@@ -23,7 +23,6 @@ public static class Program
 
         while (running)
         {
-            // Fenêtre trop petite ?
             if (ConsoleLayout.IsTooSmall)
             {
                 Console.Clear();
@@ -39,7 +38,8 @@ public static class Program
             }
 
             int menuChoice = MainMenuScreen.Show();
-            if (menuChoice == 2) { running = false; break; }
+            if (menuChoice == 3) { running = false; break; }
+            if (menuChoice != 0) continue; // Paramètres/Aide déjà gérés dans MainMenuScreen
 
             Difficulty difficulty = DifficultyScreen.Show();
 
@@ -74,7 +74,6 @@ public static class Program
             int selected = 0;
             int displayCorrect = -1;
 
-            // ── Sélection de la réponse ────────────────────────
             FrameBuffer.SafeClear();
 
             while (true)
@@ -90,22 +89,18 @@ public static class Program
                 else if (key == ConsoleKey.Enter) break;
             }
 
-            // ── Résolution ─────────────────────────────────────
             bool correct = (selected == correctIndex);
             string selectedAnswer = shuffled[selected];
 
             if (correct) { player.CorrectCount++; enemy.Hp--; }
             else { player.WrongCount++; player.Hp--; }
 
-            // ── Révéler la bonne réponse ───────────────────────
             FrameBuffer.SafeClear();
             displayCorrect = correctIndex;
             CombatScreen.Draw(session, question, shuffled, selected, displayCorrect, null, ConsoleColor.White);
 
-            // ── Feedback pédagogique ───────────────────────────
             FeedbackScreen.Show(question, correct, selectedAnswer);
 
-            // ── Ennemi vaincu ? ───────────────────────────────
             if (enemy.IsDefeated)
             {
                 int oldLevel = player.Level;
@@ -123,8 +118,14 @@ public static class Program
         }
 
         if (session.IsVictory)
+        {
+            ProgressService.Load().MarkCompleted(session.Config.Level);
+            ProgressService.Save();
             return VictoryScreen.Show(session);
+        }
         else
+        {
             return GameOverScreen.Show(session);
+        }
     }
 }

@@ -6,7 +6,7 @@ public static class QuestionBank
 {
     public static List<Question> Build()
     {
-        return new List<Question>
+        var baseList = new List<Question>
         {
             // ── FACILE ──────────────────────────────────────────────
             new Question
@@ -464,5 +464,8 @@ public static class QuestionBank
                 Hint = "Virtualisation = plusieurs OS sur une machine."
             }
         };
+
+        .Concat(ExtremeQuestions.Build())
+        .ToList();
     }
 }

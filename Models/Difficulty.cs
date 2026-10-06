@@ -4,7 +4,8 @@ public enum Difficulty
 {
     Easy = 1,
     Normal = 2,
-    Hard = 3
+    Hard = 3,
+    Extreme = 4
 }
 
 public class DifficultyConfig
@@ -23,4 +24,5 @@ public class DifficultyConfig
     public string TitlePrefix { get; init; } = "═══";
     public string TitleSuffix { get; init; } = "═══";
     public string Accent { get; init; } = "";
+    public bool IsMultiPhase { get; init; }
 }

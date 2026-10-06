@@ -11,7 +11,7 @@ public static class DifficultyConfigs
             Level = Difficulty.Easy,
             Name = "FACILE",
             Subtitle = "Une première expédition dans le monde informatique.",
-            Description = "Des bugs simples et des concepts accessibles t'attendent.",
+            Description = "Des bugs simples et des concepts accessibles.",
             DifficultyLabel = "INITIATION",
             EnemyHpBase = 3,
             EnemyCount = 5,
@@ -21,14 +21,15 @@ public static class DifficultyConfigs
             Separator = "─",
             TitlePrefix = "╔══",
             TitleSuffix = "══╗",
-            Accent = "Green"
+            Accent = "Green",
+            IsMultiPhase = false
         },
         [Difficulty.Normal] = new DifficultyConfig
         {
             Level = Difficulty.Normal,
             Name = "NORMAL",
             Subtitle = "Les menaces techniques se font plus sérieuses.",
-            Description = "Des ennemis plus coriaces et des questions plus techniques.",
+            Description = "Des ennemis plus coriaces, des questions plus techniques.",
             DifficultyLabel = "INTERMÉDIAIRE",
             EnemyHpBase = 4,
             EnemyCount = 5,
@@ -38,7 +39,8 @@ public static class DifficultyConfigs
             Separator = "─",
             TitlePrefix = "┏━━",
             TitleSuffix = "━━┓",
-            Accent = "Yellow"
+            Accent = "Yellow",
+            IsMultiPhase = false
         },
         [Difficulty.Hard] = new DifficultyConfig
         {
@@ -55,7 +57,26 @@ public static class DifficultyConfigs
             Separator = "═",
             TitlePrefix = "▓▓▓",
             TitleSuffix = "▓▓▓",
-            Accent = "Red"
+            Accent = "Red",
+            IsMultiPhase = false
+        },
+        [Difficulty.Extreme] = new DifficultyConfig
+        {
+            Level = Difficulty.Extreme,
+            Name = "EXTRÊME",
+            Subtitle = "Au-delà du code. Le chaos pur.",
+            Description = "Multi-phases, questions en série. Le vrai cauchemar.",
+            DifficultyLabel = "CAUCHEMAR",
+            EnemyHpBase = 6,
+            EnemyCount = 5,
+            ThemeColors = new[] { "DarkMagenta", "Magenta", "White" },
+            BorderTop = "▓",
+            BorderSide = "█",
+            Separator = "═",
+            TitlePrefix = "▓▓▓▓▓",
+            TitleSuffix = "▓▓▓▓▓",
+            Accent = "Magenta",
+            IsMultiPhase = true
         }
     };
 
